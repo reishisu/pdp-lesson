@@ -5,7 +5,7 @@
 例）python Monochrome.py 画像.pngとか
 
 事前に
-　pip install opencv-pythonでOpenCV
+　pip install opencv-python
 　pip install matplotlib
 をしておく
 """
@@ -15,36 +15,64 @@ import matplotlib.pyplot as plt
 import common
 import cv2
 import sys
+import os
 
-# 画像を読み込み
-fileName = sys.argv[1]
-img = cv2.imread(fileName)
-img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 def main():
-    changeToGray()
+    # コンソールを綺麗にする
+    os.system('clear')
+
+    # コマンドライン引数から画像を読み込み
+    fileName = sys.argv[1]
+    img = cv2.imread(fileName)
+
+    # 色の並びがデフォルトでは[B, G, R]となっているので[R, G, B]に変換する
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    # グレースケールにする処理
+    img = changeToGray(img)
+
+    # グレースケールに変換された画像を保存する
+    cv2.imwrite(common.anyFileNameGrayExetention(fileName), img)
+
+    # 画像を表示
     plt.imshow(img)
     plt.show()
 
 
-def changeToGray():
+def changeToGray(img):
     """
     画像をモノクロに変更する関数
+
+    Parameters
+    ----------
+    img : np.Array
+        画像の配列
+
+    Returns
+    -------
+    gray_img : np.Array
+        グレースケールに変換された画像の配列
     """
     line_num = 1
+    gray_img = img
+
     # 縦の行のループ
-    for height in img:
+    for height in gray_img:
+
         # 横の行のループ
         for width in height:
             # グレースケールにするする処理
             # グレーの値 = Redの値*0.3 + Greenの値*0.59 + Blueの値*0.11
             gray = int(width[0]*0.3) + int(width[1]*0.59) + int(width[2]*0.11)
-            width[0] = gray 
-            width[1] = gray
-            width[2] = gray
-        common.progressBar(line_num, len(img))
+            width[0] = gray # Red  
+            width[1] = gray # Green
+            width[2] = gray # Blue
+
+        # 進捗バーを表示する関数
+        common.progressBar(line_num, len(gray_img))
         line_num += 1
-    print("")
+    return gray_img
 
 if __name__ == '__main__':
     main()
