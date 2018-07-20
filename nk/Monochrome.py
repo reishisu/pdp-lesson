@@ -16,7 +16,7 @@ import common
 import cv2
 import sys
 import os
-
+import time
 
 def main():
     # コンソールを綺麗にする
@@ -56,6 +56,8 @@ def changeToGray(img):
     """
     line_num = 1
     gray_img = img
+    start = time.time()
+    print("計測を始めます")
 
     # 縦の行のループ
     for height in gray_img:
@@ -72,6 +74,7 @@ def changeToGray(img):
         # 進捗バーを表示する関数
         common.progressBar(line_num, len(gray_img))
         line_num += 1
+    print ("\nかかった時間 : " + str(time.time()-start) + "[秒]")
     return gray_img
 
 if __name__ == '__main__':
