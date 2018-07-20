@@ -1,8 +1,12 @@
 """
 画像をモノクロにする
+
+画像をコマンドライン引数で渡しておく
+例）python Monochrome.py 画像.pngとか
+
 事前に
-pip install opencv-pythonでOpenCV
-pip install matplotlib
+　pip install opencv-pythonでOpenCV
+　pip install matplotlib
 をしておく
 """
 
