@@ -37,12 +37,14 @@ def changeToGray():
         # 横の行のループ
         for width in height:
             # グレースケールにするする処理
+            # グレーの値 = Redの値*0.3 + Greenの値*0.59 + Blueの値*0.11
             gray = int(width[0]*0.3) + int(width[1]*0.59) + int(width[2]*0.11)
-            width[0] = gray # Redの値*0.3
-            width[1] = gray # Greenの値*0.59
-            width[2] = gray # Blueの値*0.11
+            width[0] = gray 
+            width[1] = gray
+            width[2] = gray
         common.progressBar(line_num, len(img))
         line_num += 1
+    print("")
 
 if __name__ == '__main__':
     main()
