@@ -5,84 +5,94 @@
 例）python Monochrome.py 画像.pngとか
 
 事前に
-　pip install opencv-python
-　pip install matplotlib
+  pip install opencv-python
+  pip install matplotlib
+  pip install futures
 をしておく
 """
 
 # スレッドで並列化を利用する為に必要なモジュール
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import concurrent.futures
 
 # その他各ライブラリをインポート
 import matplotlib.pyplot as plt
+import numpy as np
 import cv2
 import common
 import sys
 import os
+import time
 
 
-def main():
-    """ 実行されるメイン関数 """
-    # コンソールを綺麗にする
-    os.system('clear')
-    # コマンドライン引数から画像を読み込み
-    fileName = sys.argv[1]
-    img = cv2.imread(fileName)
-    # 色の並びがデフォルトでは[B, G, R]となっているので[R, G, B]に変換する
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+# コンソールをクリア
+os.system('clear')
 
-    print(len(img))         # 縦
-    print(len(img[0]))      # 横
-    print(len(img[0][0]))   # RGB
-    cores = os.cpu_count()
-    print(len(img)/os.cpu_count())
+# コマンドライン引数から画像を読み込む
+img = common.getRGBImage( sys.argv[1] )
+
+start = time.time()
+useCPU = 2
+count = 0
 
 
-    # マルチプロセスを管理する配列
-    futures = []
-    #  CPUのコア数を取得している
-    # cpu_core = os.cpu_count()
-    pool = ThreadPoolExecutor(4)
-    # 仕事の分割数
-    task_num = cpu_core * 2
-    # 使用するコア数を引数にとって並列処理を実行する
-    with ProcessPoolExecutor( cpu_core ) as executer:
-        # 配列の要素をタスク数で割って均等に分散させる
-        avg = int( len( img ) / task_num )
-        
-        # タスクを実行する
-        for index in range( task_num ):
-
-            # 前の添字
-            pre = avg * index
-
-            # 今の添字
-            now = avg * (index + 1)
-            
-            # マルチプロセスを管理する配列にプロセス追加する
-            futures.append(executer.submit(paralleImageToMono, img[ pre, now], index))
-
-    # 実行が終わったのから結果を表示
-    for x in as_completed(futures):
-        print( x.result() )
-
-
-def paralleImageToMono(partImage):
+def changeToGray( number: int, width: np.ndarray ):
     """
     並列化する処理
-    @param  width (np.Array) : 元の画像の配列一部
-    @return 
+    @param  number (int)       : このスレッドの番号
+    @param  width (np.ndarray) : 元の画像を行で分割した画像の配列
+    @return number (int)       : このスレッドの番号
+    @return width (np.ndarray) : グレースケールに変換された画像の配列
     """
-    grayImage = partImage
-    for height in grayImage:
-        for width in height:
-            # グレースケールにするする処理
-            # グレーの値 = Redの値*0.3 + Greenの値*0.59 + Blueの値*0.11
-            gray = int(width[0]*0.3) + int(width[1]*0.59) + int(width[2]*0.11)
-            width[0] = gray # Red  
-            width[1] = gray # Green
-            width[2] = gray # Blue
-    return grayImage
+    for pixel in width:
+        # グレースケールにするする処理
+        # グレーの値 = Redの値*0.3 + Greenの値*0.59 + Blueの値*0.11
+        gray = int(pixel[0]*0.3) + int(pixel[1]*0.59) + int(pixel[2]*0.11)
+        pixel[0] = gray # Red  
+        pixel[1] = gray # Green
+        pixel[2] = gray # Blue
+    return number, width
 
-if __name__ == '__main__':
-    main()
+
+def mulchProcess(useCPU: int):
+    print("")
+    start = time.time()
+    count = 0
+    print("{0}コアで処理を開始します!!".format(useCPU))
+    with concurrent.futures.ProcessPoolExecutor(max_workers=useCPU) as executer:
+        fs = [ executer.submit(changeToGray, i, width) for width, i in zip( img, range(len(img)) ) ]
+
+        for future in concurrent.futures.as_completed(fs):
+            line_number = future.result()[0]
+            gray_width  = future.result()[1]
+            # print(type(future.result()))  OK!!
+            # print(gray_width)             OK!!
+            img[line_number] = gray_width
+            count += 1
+            common.progressBar(count, len(img))
+    print("終了しました!!")
+    print("かかった時間:{0}秒".format( int(time.time()-start) ))
+
+for i in range(1, os.cpu_count()):
+    mulchProcess(useCPU=i)
+
+
+# for i in range(3, os.cpu_count()):
+#     print("")
+#     print("")
+#     start = time.time()
+#     count = 0
+#     with concurrent.futures.ProcessPoolExecutor(max_workers=i) as executer:
+#         print("{0}コアで処理を開始します!!".format(i))
+
+#         fs = [ executer.submit(changeToGray, i, width) for width, i in zip( img, range(len(img)) ) ]
+
+#         for future in concurrent.futures.as_completed(fs):
+#             line_number = future.result()[0]
+#             gray_width  = future.result()[1]
+#             # print(type(future.result()))  OK!!
+#             # print(gray_width)             OK!!
+#             img[line_number] = gray_width
+#             count += 1
+#             common.progressBar(count, len(img))
+#         print("終了しました!!")
+#         print("かかった時間:{0}秒".format( int(time.time()-start) ))

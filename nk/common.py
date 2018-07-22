@@ -1,6 +1,8 @@
 """
 共通の処理を行うモジュール
 """
+import cv2
+
 
 def progressBar(start, end):
     """
@@ -10,7 +12,7 @@ def progressBar(start, end):
     """
     print( "\r進捗率：[" + "#" * int(start/end*100) + 
            " " * (100 - int(start/end*100)) + "] " + str(start) + 
-           "/" + str(end) + " 書き込み済", end="" )
+           "/" + str(end) + " 処理済", end="" )
 
 
 
@@ -43,3 +45,17 @@ def anyFileNameGrayExetention(oldFileName: str):
         newFileName += tmp[i]
     # 拡張子の前に_grayをつけて返す
     return newFileName + "_gray." + tmp[len(tmp)-1]
+
+
+
+def getRGBImage(filePath: str):
+    """
+    画像を読み込んでRGBの配列にして返す関数
+    @param  filePath (str)      : 画像のファイルパス
+    @return RGBImage (np.Array) : RGBに変換された画像の配列
+    """
+    # 引数から画像を読み込み
+    img = cv2.imread(filePath)
+
+    # 色の並びがデフォルトでは[B, G, R]となっているので[R, G, B]に変換して返す
+    return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

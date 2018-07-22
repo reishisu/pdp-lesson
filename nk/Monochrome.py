@@ -26,10 +26,7 @@ def main():
 
     # コマンドライン引数から画像を読み込み
     fileName = sys.argv[1]
-    img = cv2.imread(fileName)
-
-    # 色の並びがデフォルトでは[B, G, R]となっているので[R, G, B]に変換する
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = common.getRGBImage(fileName)
 
     # グレースケールにする処理
     img = changeToGray(img)
