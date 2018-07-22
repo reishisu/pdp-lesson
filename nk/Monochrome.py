@@ -19,6 +19,8 @@ import os
 import time
 
 def main():
+    """ 実行されるメイン関数 """
+
     # コンソールを綺麗にする
     os.system('clear')
 
@@ -43,16 +45,8 @@ def main():
 def changeToGray(img):
     """
     画像をモノクロに変更する関数
-
-    Parameters
-    ----------
-    img : np.Array
-        画像の配列
-
-    Returns
-    -------
-    gray_img : np.Array
-        グレースケールに変換された画像の配列
+     @param  img (np.Array)       : 画像の配列
+     @return gray_img (np.Array)  : グレースケールに変換された画像の配列
     """
     line_num = 1
     gray_img = img
