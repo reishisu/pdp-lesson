@@ -69,30 +69,9 @@ def mulchProcess(useCPU: int):
             img[line_number] = gray_width
             count += 1
             common.progressBar(count, len(img))
-    print("終了しました!!")
-    print("かかった時間:{0}秒".format( int(time.time()-start) ))
+    print("\n終了しました!!")
+    print("かかった時間:{0}秒".format( time.time()-start ))
 
-for i in range(1, os.cpu_count()):
+
+for i in range(1, os.cpu_count()+1):
     mulchProcess(useCPU=i)
-
-
-# for i in range(3, os.cpu_count()):
-#     print("")
-#     print("")
-#     start = time.time()
-#     count = 0
-#     with concurrent.futures.ProcessPoolExecutor(max_workers=i) as executer:
-#         print("{0}コアで処理を開始します!!".format(i))
-
-#         fs = [ executer.submit(changeToGray, i, width) for width, i in zip( img, range(len(img)) ) ]
-
-#         for future in concurrent.futures.as_completed(fs):
-#             line_number = future.result()[0]
-#             gray_width  = future.result()[1]
-#             # print(type(future.result()))  OK!!
-#             # print(gray_width)             OK!!
-#             img[line_number] = gray_width
-#             count += 1
-#             common.progressBar(count, len(img))
-#         print("終了しました!!")
-#         print("かかった時間:{0}秒".format( int(time.time()-start) ))
