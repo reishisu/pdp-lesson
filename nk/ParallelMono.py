@@ -31,9 +31,8 @@ os.system('clear')
 img = common.getRGBImage( sys.argv[1] )
 
 start = time.time()
-useCPU = 2
+useCPU =  int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count() )) )
 count = 0
-
 
 def changeToGray( number: int, width: np.ndarray ):
     """
@@ -73,5 +72,6 @@ def mulchProcess(useCPU: int):
     print("かかった時間:{0}秒".format( time.time()-start ))
 
 
-for i in range(1, os.cpu_count()+1):
-    mulchProcess(useCPU=i)
+mulchProcess(useCPU=useCPU)
+# for i in range(1, os.cpu_count()+1):
+#     mulchProcess(useCPU=i)
