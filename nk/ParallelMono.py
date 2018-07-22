@@ -30,9 +30,13 @@ os.system('clear')
 # コマンドライン引数から画像を読み込む
 img = common.getRGBImage( sys.argv[1] )
 
-start = time.time()
-useCPU =  int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count())) )
-count = 0
+# スレッドかCPUか選ぶ
+multchType = int( input("マルチスレッドかマルチプロセスどちらにしますか？\n[1:マルチスレッド 2:マルチプロセス] : ".format(os.cpu_count())) )
+
+# 使用数を初期化
+useThread = 1
+useCPU = 1
+
 
 def changeToGray( number: int, width: np.ndarray ):
     """
@@ -50,6 +54,7 @@ def changeToGray( number: int, width: np.ndarray ):
         pixel[1] = gray # Green
         pixel[2] = gray # Blue
     return number, width
+
 
 
 def mulchProcess(useCPU: int):
@@ -73,6 +78,39 @@ def mulchProcess(useCPU: int):
     print("かかった時間:{0}秒".format( time.time()-start ))
 
 
-mulchProcess(useCPU=useCPU)
+
+def mulchThread(useThread: int):
+    """
+    スレッドを生成して実行させる処理
+    @param  useThread (int)  : 使用するスレッドの数
+    """
+    print("")
+    start = time.time()
+    count = 0
+    print("{0}スレッドで処理を開始します!!".format(useThread))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=useThread) as executer:
+        fs = [ executer.submit(changeToGray, i, width) for width, i in zip( img, range(len(img)) ) ]
+        for future in concurrent.futures.as_completed(fs):
+            line_number = future.result()[0]
+            gray_width  = future.result()[1]
+            img[line_number] = gray_width
+            count += 1
+            common.progressBar(count, len(img))
+    print("\n終了しました!!")
+    print("かかった時間:{0}秒".format( time.time()-start ))
+    plt.imshow(img)
+    plt.show()
+
+# 使用する数を選択
+if multchType == 1:
+    useThread = int( input("使用するスレッドの数を入力してください : ") )
+    mulchThread(useThread= useThread)
+elif multchType == 2:
+    useCPU = int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count())) )
+    mulchProcess(useCPU= useCPU)
+else:
+    print("どちらでもないので終了")
+    exit(0)
+
 # for i in range(1, os.cpu_count()+1):
 #     mulchProcess(useCPU=i)
