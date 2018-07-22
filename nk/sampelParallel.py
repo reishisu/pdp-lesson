@@ -40,10 +40,9 @@ import time
 # 個人的には終わりを待って実行できる方が確実に並列かできると感じた 
 # 
 # concurrent.futures.wait( fs )について
-#     1. スレッドの最大本数分だけ待ってくれる
-#     2. もしスレッドの最大本数が5本なら5本が確実に終わるまで次のスレッドは実行されない
-#     3. しかし、実行中のスレッドの中での実行は終わったもの順で実行される
-#     4. ほぼ同時で、高速に終わるなら次のFutureと混じることもあった
+#     1. 全部のFutureが帰ってくるまで待機する
+#     2. 実行結果を見るのが一番わかりやすかった
+#     3. 画像を処理の際にはwait()は使わずにas_completed()を使ったほうが良さそう
 #
 #########################################################################
 #########################################################################
@@ -55,7 +54,7 @@ range_num = 20
 
 def executer_sum( number ):
     try:
-        time.sleep(range_num-number)
+        time.sleep(number)
         print(str(number) + " ", end="", flush=True)
         return number
     except:
@@ -64,7 +63,7 @@ def executer_sum( number ):
 
 # 並列処理
 start = time.time()
-with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executer:
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executer:
     fs = [ executer.submit(executer_sum, i) for i in range(range_num) ]
     #### ↑の略さない書き方
     # fs = []   # スレッドを格納する配列
@@ -72,15 +71,21 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executer:
     #     fs.append( executer.submit(executer_sum, i) )
 
     #### みんなの終わり待たない
+    # [ 実行結果 ]
+    # 0 f 1 f 2 f 3 f 4 f 5 f 6 f 7 f 8 f 9 f 10 f 11 f 12 f 13 f 14 f 15 f 16 f 17 f 18 f 19 f
     # for future in concurrent.futures.as_completed(fs):
+    #     print("f", end=" ", flush=True)
     #     sample_num += future.result()
     # print("\n実行が終了しました")
     # print("かかった時間:" + str(time.time() - start))
     # print("")
 
     #### みんなの終わり待つ
-    concurrent.futures.wait(fs)     # この行で終わり待ち(感覚的にMax_workers単位の待ち)
+    # [ 実行結果 ]
+    # 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 f f f f f f f f f f f f f f f f f f f f
+    concurrent.futures.wait(fs)     # この行で終わり待ち(全Futureの実行待ち)
     for future in fs:
+        print("f", end=" ", flush=True)
         sample_num += future.result()
     print("\n実行が終了しました")
     print("かかった時間:" + str(time.time() - start))
