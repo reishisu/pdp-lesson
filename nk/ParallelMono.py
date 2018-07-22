@@ -1,9 +1,7 @@
 """
 並列で画像をモノクロにする
-
 画像をコマンドライン引数で渡しておく
 例）python Monochrome.py 画像.pngとか
-
 事前に
   pip install opencv-python
   pip install matplotlib
@@ -30,12 +28,35 @@ os.system('clear')
 # コマンドライン引数から画像を読み込む
 img = common.getRGBImage( sys.argv[1] )
 
-# スレッドかCPUか選ぶ
-multchType = int( input("マルチスレッドかマルチプロセスどちらにしますか？\n[1:マルチスレッド 2:マルチプロセス] : ".format(os.cpu_count())) )
-
 # 使用数を初期化
 useThread = 1
 useCPU = 1
+
+def main():
+    # スレッドかCPUか選ぶ
+    msg = "マルチスレッドかマルチプロセスどちらにしますか？\n"\
+          "[1:マルチスレッド 2:マルチプロセス] : "
+    multchType = int( input(msg.format(os.cpu_count())) )
+    # 使用する数を選択
+    if multchType == 1:
+        useThread = int( input("使用するスレッドの数を入力してください : ") )
+        if useThread > 1:
+            mulchThread(useThread= useThread)
+            plt.imshow(img)
+            plt.show()
+        else:
+            print("0以下なので終了")
+    elif multchType == 2:
+        useCPU = int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count())) )
+        if useCPU >= 1 and useCPU <= os.cpu_count():
+            mulchProcess(useCPU= useCPU)
+            plt.imshow(img)
+            plt.show()
+        else:
+            print("選択の範囲外なので終了")
+    else:
+        print("どちらでもないので終了")
+
 
 
 def changeToGray( number: int, width: np.ndarray ):
@@ -98,19 +119,8 @@ def mulchThread(useThread: int):
             common.progressBar(count, len(img))
     print("\n終了しました!!")
     print("かかった時間:{0}秒".format( time.time()-start ))
-    plt.imshow(img)
-    plt.show()
 
-# 使用する数を選択
-if multchType == 1:
-    useThread = int( input("使用するスレッドの数を入力してください : ") )
-    mulchThread(useThread= useThread)
-elif multchType == 2:
-    useCPU = int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count())) )
-    mulchProcess(useCPU= useCPU)
-else:
-    print("どちらでもないので終了")
-    exit(0)
 
-# for i in range(1, os.cpu_count()+1):
-#     mulchProcess(useCPU=i)
+
+if __name__ == '__main__':
+    main()
