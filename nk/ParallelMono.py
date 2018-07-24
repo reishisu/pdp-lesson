@@ -29,21 +29,21 @@ os.system('clear')
 img = common.getRGBImage( sys.argv[1] )
 
 # 使用数を初期化
-useThread = 1
 useCPU = 1
 
 def main():
-    useCPU = int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count())) )
-    if useCPU >= 1:
-        if useCPU > os.cpu_count():
-            useCPU = os.cpu_count()
-        mulchProcess(useCPU= useCPU)
-        plt.imshow(img)
-        plt.show()
-    else:
-        print("選択の範囲外なので終了")
-
-
+    try:
+        useCPU = int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count())) )
+    except:
+        useCPU = os.cpu_count()
+    if useCPU > os.cpu_count():
+        useCPU = os.cpu_count()
+    step = int( len(img) / useCPU )
+    print("{0}コアで処理を開始します!!".format(useCPU))
+    mulchProcess(useCPU= useCPU)
+    plt.imshow(img)
+    plt.show()
+            
 
 def changeToGray( number: int, width: np.ndarray ):
     """
@@ -63,16 +63,13 @@ def changeToGray( number: int, width: np.ndarray ):
     return number, width
 
 
-
 def mulchProcess(useCPU: int):
     """
     マルチコアでプロセスを生成して実行させる処理
     @param  useCPU (int)  : 使用するCPUのコア数
     """
-    print("")
     start = time.time()
     count = 0
-    print("{0}コアで処理を開始します!!".format(useCPU))
     with concurrent.futures.ProcessPoolExecutor(max_workers=useCPU) as executer:
         fs = [ executer.submit(changeToGray, i, width) for width, i in zip( img, range(len(img)) ) ]
         for future in concurrent.futures.as_completed(fs):
@@ -81,9 +78,8 @@ def mulchProcess(useCPU: int):
             img[line_number] = gray_width
             count += 1
             common.progressBar(count, len(img))
-    print("\n終了しました!!")
+    print("終了しました!!")
     print("かかった時間:{0}秒".format( time.time()-start ))
-
 
 
 if __name__ == '__main__':
