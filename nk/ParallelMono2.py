@@ -57,19 +57,13 @@ def changeToGray( number: int , length: int ):
     @return part_height (int) : 処理後の画像の配列
     """
     start = time.time()
-    endPioint = number + length  if number + length < len(img)  else  len(img) - 1
-    part_height = img[ number : endPioint-1 ]
+    endPoint = number + length-1 if number + length < len(img)  else  len(img) - 1
+    print("number {0} : endPoint = {1}".format(number, endPoint))
+    part_height = img[ number : endPoint ]
     count = 0
     for width in part_height:
-        for pixel in width:
-            # グレースケールにするする処理
-            # グレーの値 = Redの値*0.3 + Greenの値*0.59 + Blueの値*0.11
-            gray = int(pixel[0]*0.3) + int(pixel[1]*0.59) + int(pixel[2]*0.11)
-            pixel[0] = gray # Red  
-            pixel[1] = gray # Green
-            pixel[2] = gray # Blue
-        count += 1
-        common.progressBar(count, len(part_height))
+
+        width[...] = np.tile((width * [0.3, 0.59, 0.11]).sum(axis=1), (3, 1)).T
     return number, part_height
 
 
@@ -87,8 +81,7 @@ def mulchProcess(useCPU: int, step: int):
         for future in concurrent.futures.as_completed(fs):
             line_number = future.result()[0]
             part_height  = future.result()[1]
-            for i, height in zip( range(line_number, line_number+len(part_height)), part_height ):
-                img[i] = height
+            img[line_number:line_number+len(part_height)] = part_height
     print("終了しました!!")
     print("かかった時間:{0}秒".format( time.time()-start ))
 
