@@ -1,4 +1,9 @@
 """
+並列処理成功作
+( モノクロ処理　＜ まとめる処理 )
+まとめる処理 × コア数
+まとめる処理を減らしてうまく高速化できた！！
+
 並列で画像をモノクロにする
 画像をコマンドライン引数で渡しておく
 例）python Monochrome.py 画像.pngとか
@@ -34,6 +39,7 @@ useCPU = 1
 # ステップ数を初期化
 step = 1
 
+
 def main():
     try:
         useCPU = int( input("使用するCPUのコアを入力してください[ 1 ~ {0} ] : ".format(os.cpu_count())) )
@@ -41,7 +47,9 @@ def main():
         useCPU = os.cpu_count()
     if useCPU > os.cpu_count():
         useCPU = os.cpu_count()
-    step = int( len(img) / useCPU )
+    if useCPU > len(img):
+        useCPU = len(img)
+    step = int( len(img) / useCPU ) if int( len(img) / useCPU ) > 0 else 1
     print("{0}コアで処理を開始します!!".format(useCPU))
     mulchProcess(useCPU=useCPU, step= step)
     plt.imshow(img)
@@ -57,13 +65,13 @@ def changeToGray( number: int , length: int ):
     @return part_height (int) : 処理後の画像の配列
     """
     start = time.time()
-    endPoint = number + length-1 if number + length < len(img)  else  len(img) - 1
-    print("number {0} : endPoint = {1}".format(number, endPoint))
+    endPoint = number + length if number + length < len(img)  else  len(img) - 1
     part_height = img[ number : endPoint ]
     count = 0
     for width in part_height:
-
         width[...] = np.tile((width * [0.3, 0.59, 0.11]).sum(axis=1), (3, 1)).T
+        count += 1
+        common.progressBar(count, len(part_height))
     return number, part_height
 
 
