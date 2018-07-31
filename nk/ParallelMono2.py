@@ -81,7 +81,6 @@ def mulchProcess(useCPU: int, step: int):
     @param  useCPU (int)  : 使用するCPUのコア数
     @param  step   (int)  : 画像の高さをコア数で割った数
     """
-    # 配列の区切りポイント
     index_list = [ i for i in range(0, len(img), step)  if i < len(img) ]
     start = time.time()
     with concurrent.futures.ProcessPoolExecutor(max_workers=useCPU) as executer:

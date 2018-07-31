@@ -20,28 +20,32 @@ import time
 
 img = common.getRGBImage( sys.argv[1] )
 useCPU = int( sys.argv[2] )
-step = int( len(img) / useCPU )
 
 def main():
-    mulchProcess(useCPU=useCPU, step= step)
+    mulchProcess(useCPU=useCPU)
+            
 
-def changeToGray( number: int , length: int ):
-    start = time.time()
-    endPoint = number + length if number + length < len(img)  else  len(img) - 1
-    part_height = img[ number : endPoint ]
-    for width in part_height:
-        width[...] = np.tile((width * [0.3, 0.59, 0.11]).sum(axis=1), (3, 1)).T
-    return number, part_height
+def changeToGray( number: int, width: np.ndarray ):
+    """
+    並列化する処理
+    @param  number (int)       : このプロセスの番号
+    @param  width (np.ndarray) : 横１行の配列[ [R, G, B], ・・・・ ,[R, G, B] ]
+    @return number (int)       : このプロセスの番号
+    @return width (np.ndarray) : 引数で受け取った配列をグレースケールに変換した配列
+    """
+    return number, np.tile((width * [0.3, 0.59, 0.11]).sum(axis=1), (3, 1)).T
 
-def mulchProcess(useCPU: int, step: int):
-    index_list = [ i for i in range(0, len(img), step)  if i < len(img) ]
+
+def mulchProcess(useCPU: int):
+    """
+    マルチコアでプロセスを生成して実行させる処理
+    @param  useCPU (int)  : 使用するCPUのコア数
+    """
     start = time.time()
     with concurrent.futures.ProcessPoolExecutor(max_workers=useCPU) as executer:
-        fs = [ executer.submit(changeToGray, i, step) for i in index_list ]
+        fs = [ executer.submit(changeToGray, i, width) for width, i in zip( img, range(len(img)) ) ]
         for future in concurrent.futures.as_completed(fs):
-            line_number = future.result()[0]
-            part_height  = future.result()[1]
-            img[line_number:line_number+len(part_height)] = part_height
+            img[future.result()[0]] = future.result()[1]
     finish = time.time()-start
     print(str(finish))
 
