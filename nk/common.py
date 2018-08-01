@@ -56,6 +56,5 @@ def getRGBImage(filePath: str):
     """
     # 引数から画像を読み込み
     img = cv2.imread(filePath)
-
     # 色の並びがデフォルトでは[B, G, R]となっているので[R, G, B]に変換して返す
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
