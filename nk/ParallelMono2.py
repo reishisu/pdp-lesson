@@ -67,11 +67,8 @@ def changeToGray( number: int , length: int ):
     start = time.time()
     endPoint = number + length if number + length < len(img)  else  len(img) - 1
     part_height = img[ number : endPoint ]
-    count = 0
     for width in part_height:
         width[...] = np.tile((width * [0.3, 0.59, 0.11]).sum(axis=1), (3, 1)).T
-        count += 1
-        common.progressBar(count, len(part_height))
     return number, part_height
 
 
@@ -81,14 +78,17 @@ def mulchProcess(useCPU: int, step: int):
     @param  useCPU (int)  : 使用するCPUのコア数
     @param  step   (int)  : 画像の高さをコア数で割った数
     """
-    index_list = [ i for i in range(0, len(img), step)  if i < len(img) ]
     start = time.time()
+    count = 0
+    index_list = [ i for i in range(0, len(img), step)  if i < len(img) ]
     with concurrent.futures.ProcessPoolExecutor(max_workers=useCPU) as executer:
         fs = [ executer.submit(changeToGray, i, step) for i in index_list ]
         for future in concurrent.futures.as_completed(fs):
             line_number = future.result()[0]
             part_height  = future.result()[1]
             img[line_number:line_number+len(part_height)] = part_height
+            count += 1
+            common.progressBar(count, len(fs))
     print("終了しました!!")
     print("かかった時間:{0}秒".format( time.time()-start ))
 
