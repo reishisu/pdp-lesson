@@ -22,7 +22,10 @@ img = common.getRGBImage( sys.argv[1] )
 useCPU = int( sys.argv[2] )
 
 def main():
+    print("{0}コアで実行します！！".format(useCPU))
     mulchProcess(useCPU=useCPU)
+    plt.imshow(img)
+    plt.show()
             
 
 def changeToGray( number: int, width: np.ndarray ):
@@ -47,7 +50,7 @@ def mulchProcess(useCPU: int):
         for future in concurrent.futures.as_completed(fs):
             img[future.result()[0]] = future.result()[1]
     finish = time.time()-start
-    print(str(finish))
+    print(str(finish) + "秒かかりました！！")
 
 
 if __name__ == '__main__':

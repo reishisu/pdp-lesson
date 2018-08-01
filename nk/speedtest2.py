@@ -23,7 +23,10 @@ useCPU = int( sys.argv[2] )
 step = int( len(img) / useCPU )
 
 def main():
+    print("{0}コアで実行します！！".format(useCPU))
     mulchProcess(useCPU=useCPU, step= step)
+    plt.imshow(img)
+    plt.show()
 
 def changeToGray( number: int , length: int ):
     start = time.time()
@@ -43,7 +46,7 @@ def mulchProcess(useCPU: int, step: int):
             part_height  = future.result()[1]
             img[line_number:line_number+len(part_height)] = part_height
     finish = time.time()-start
-    print(str(finish))
+    print(str(finish) + "秒かかりました！！")
 
 
 if __name__ == '__main__':
