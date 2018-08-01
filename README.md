@@ -51,7 +51,8 @@ TOP
 ┃　┣ speedtest2.py .. ParallelMono2.pyの画像処理部分の実行速度を計測して表示する  
 ┃　┗ グレースケール処理時間計測結果.xlsx .. 実行速度などをExcelファイルにまとめたもの  
 ┃  
-┗ README.md .. このファイル  
+┣ README.md  
+┗ pdp-lesson.iml  
 ```
 
 ## 実行する前に
