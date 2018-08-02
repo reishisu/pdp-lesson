@@ -29,7 +29,7 @@ TOP
 ┣ Taken .. e165735's workspace  
 ┃　┗ Test.txt  
 ┃  
-┣ nk .. e165765's workspace  
+┣ reishisu .. e165765's workspace  
 ┃　┣ __pycache__ .. VSCodeを利用した際に出来たディレクトリ  
 ┃　┃　┗ common.cpython-36.pyc  
 ┃　┃  
