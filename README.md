@@ -75,12 +75,14 @@ python ParallelMono.py hoge/hogehoge.jpg
 python ParallelMono2.py hoge/hogehoge.png  
 ```
   
+  
 処理速度を計測するだけならspeedtest.pyとspeedtest2.pyを利用する。  
 使用する際にはコマンドライン引数として画像のパスとコア数を指定する必要がある。  
 ```
 python speedtest.py hoge/hogehoge.jpg 1  
 python speedtest2.py hoge/hogehoge.png 8  
 ```
+  
   
 もし、初期のコードを実行するならspeedtest_old.pyとspeedtest2_old.pyを利用する。  
 同じく使用する際にはコマンドライン引数として画像のパスとコア数を指定する必要がある。  
