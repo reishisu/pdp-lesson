@@ -24,13 +24,9 @@ useCPU = int( sys.argv[2] )
 step = int( len(img) / useCPU )
 
 def main():
-    print("{0}コアで実行します！！".format(useCPU))
     mulchProcess(useCPU=useCPU, step= step)
-    plt.imshow(img)
-    plt.show()
-
+    
 def changeToGray( number: int , length: int ):
-    start = time.time()
     endPoint = number + length if number + length < len(img)  else  len(img) - 1
     part_height = img[ number : endPoint ]
     for width in part_height:
