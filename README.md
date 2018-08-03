@@ -49,6 +49,8 @@ TOP
 ┃　┣ concurrent.futures.pdf .. 公式のサイトからページをDLしたもの  
 ┃　┣ speedtest.py .. ParallelMono.pyの画像処理部分の実行速度を計測して表示する  
 ┃　┣ speedtest2.py .. ParallelMono2.pyの画像処理部分の実行速度を計測して表示する  
+┃　┣ speedtest2_old.py .. ParallelMono2.pyの初期のコード	 
+┃　┣ speedtest_old.py .. ParallelMono.pyの初期のコード  
 ┃　┗ グレースケール処理時間計測結果.xlsx .. 実行速度などをExcelファイルにまとめたもの  
 ┃  
 ┣ README.md  
