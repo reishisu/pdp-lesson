@@ -81,3 +81,10 @@ python ParallelMono2.py hoge/hogehoge.png
 python speedtest.py hoge/hogehoge.jpg 1  
 python speedtest2.py hoge/hogehoge.png 8  
 ```
+  
+もし、初期のコードを実行するならspeedtest_old.pyとspeedtest2_old.pyを利用する。  
+同じく使用する際にはコマンドライン引数として画像のパスとコア数を指定する必要がある。  
+```
+python speedtest_old.py hoge/hogehoge.jpg 1  
+python speedtest2_old.py hoge/hogehoge.png 8  
+```
